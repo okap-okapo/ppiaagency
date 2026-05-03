@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PP IA Agency — Pourquoi tu as besoin de moi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --slide-w: 1080px;
+    --slide-h: 1350px;
+
+    --safe-x: 90px;
+    --safe-top: 150px;
+    --safe-bottom: 200px;
+
+    --bg-0: #07020F;
+    --bg-1: #14072B;
+    --bg-2: #2A0F5E;
+
+    --violet:        #7B2FFF;
+    --violet-light:  #A66BFF;
+    --violet-deep:   #4A1A99;
+    --violet-glow:   #B8A1FF;
+
+    --cream:         #F5F1E8;
+    --ink-on-cream:  #110422;
+
+    --ink:      #FFFFFF;
+    --ink-70:   rgba(255,255,255,0.72);
+    --ink-50:   rgba(255,255,255,0.50);
+    --ink-30:   rgba(255,255,255,0.30);
+    --line:     rgba(255,255,255,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #0b0918;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .viewer { max-width: 1240px; margin: 0 auto; padding: 64px 32px 120px; }
+
+  .viewer-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 24px; margin-bottom: 48px; padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .viewer-head h1 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
+  .viewer-head p { color: var(--ink-50); font-size: 14px; }
+  .toggle {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 16px; background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 999px;
+    color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .toggle:hover { background: rgba(255,255,255,0.10); }
+  .toggle.active { background: var(--violet); color: #fff; border-color: var(--violet); }
+
+  .slide-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-50);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin: 56px 0 16px; display: flex; gap: 16px; align-items: center;
+  }
+  .slide-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+  .slide-label:first-of-type { margin-top: 0; }
+
+  .slide {
+    position: relative; width: var(--slide-w); height: var(--slide-h);
+    overflow: hidden; border-radius: 24px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.6);
+    transform-origin: top left; margin-bottom: 8px; isolation: isolate;
+  }
+
+  .slide-wrap { width: 100%; aspect-ratio: 1080 / 1350; overflow: hidden; border-radius: 24px; }
+  .slide-wrap .slide { transform: scale(calc((100vw - 64px) / 1080)); }
+  @media (min-width: 1240px) { .slide-wrap .slide { transform: scale(calc(1176 / 1080)); } }
+
+  .canvas {
+    position: absolute; top: var(--safe-top); bottom: var(--safe-bottom);
+    left: var(--safe-x); right: var(--safe-x);
+    display: flex; flex-direction: column; z-index: 2;
+  }
+
+  .logo {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 28px;
+    letter-spacing: -0.02em; line-height: 1;
+    display: inline-flex; align-items: center; gap: 8px; color: inherit;
+  }
+  .logo .symbol {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--violet); color: #fff;
+    font-weight: 700; font-size: 18px;
+    box-shadow: 0 0 20px rgba(123,47,255,0.5);
+    font-feature-settings: "sups" on;
+  }
+
+  .top-bar { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .pagenb { font-family: 'JetBrains Mono', monospace; font-size: 14px; letter-spacing: 0.18em; color: var(--ink-50); }
+  .slide.light .pagenb { color: rgba(17,4,34,0.5); }
+
+  .bottom-bar { margin-top: auto; display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .handle { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--ink-50); letter-spacing: 0.06em; }
+  .slide.light .handle { color: rgba(17,4,34,0.55); }
+
+  .swipe {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
+    color: var(--ink-70); letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .swipe .arrow {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--violet); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    box-shadow: 0 0 16px rgba(123,47,255,0.6);
+  }
+  .slide.light .swipe { color: rgba(17,4,34,0.7); }
+
+  .slide-dark {
+    background:
+      radial-gradient(60% 50% at 80% 0%, rgba(123,47,255,0.55) 0%, transparent 60%),
+      radial-gradient(50% 40% at 0% 100%, rgba(166,107,255,0.35) 0%, transparent 60%),
+      linear-gradient(160deg, var(--bg-0) 0%, var(--bg-1) 55%, var(--bg-2) 100%);
+    color: #fff;
+  }
+  .slide-light {
+    background:
+      radial-gradient(50% 40% at 100% 0%, rgba(123,47,255,0.20) 0%, transparent 60%),
+      radial-gradient(60% 40% at 0% 100%, rgba(166,107,255,0.25) 0%, transparent 60%),
+      var(--cream);
+    color: var(--ink-on-cream);
+  }
+  .slide.light { color: var(--ink-on-cream); }
+
+  .grain {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.06; mix-blend-mode: overlay;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px),
+      radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px);
+    background-size: 3px 3px, 5px 5px;
+    background-position: 0 0, 1px 1px;
+  }
+
+  .orb { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.6; z-index: 0; }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 500;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--violet-light);
+  }
+  .slide.light .eyebrow { color: var(--violet); }
+
+  .grad-text {
+    background: linear-gradient(110deg, var(--violet-light) 0%, var(--violet-glow) 50%, #fff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  .underline-mark { position: relative; display: inline-block; }
+  .underline-mark::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -8px;
+    height: 14px; background: var(--violet); z-index: -1;
+    border-radius: 2px; transform: skewX(-6deg);
+  }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 20px; border-radius: 999px;
+    border: 1.5px solid var(--ink-30);
+    font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-70);
+  }
+  .pill .dot-mark { width: 8px; height: 8px; border-radius: 50%; background: var(--violet); box-shadow: 0 0 12px var(--violet); }
+
+  /* SLIDE 1 - HOOK PROVOCATEUR */
+  .s1 .canvas { justify-content: space-between; }
+  .s1 .hero { display: flex; flex-direction: column; gap: 28px; margin-top: auto; margin-bottom: auto; }
+  .s1 .hero .eyebrow { font-size: 22px; }
+  .s1 .hero .title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 116px; line-height: 0.92; letter-spacing: -0.03em; }
+  .s1 .hero .subtitle { font-size: 32px; color: var(--ink-70); max-width: 780px; line-height: 1.35; }
+  .s1 .orb-1 { width: 600px; height: 600px; background: var(--violet);  top: -120px; right: -180px; opacity: 0.45; }
+  .s1 .orb-2 { width: 500px; height: 500px; background: var(--violet-light);  bottom: -100px; left: -160px; opacity: 0.25; }
+
+  .sticker {
+    position: absolute; z-index: 3;
+    background: var(--violet); color: #fff;
+    padding: 16px 22px; border-radius: 14px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px;
+    letter-spacing: -0.01em; transform: rotate(-6deg);
+    box-shadow: 0 12px 30px rgba(123,47,255,0.5);
+  }
+
+  /* SLIDE 2 - LE MIROIR (light) */
+  .s2 { color: var(--ink-on-cream); }
+  .s2 .canvas { justify-content: space-between; }
+  .s2 .quote { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 76px; line-height: 1.05; letter-spacing: -0.025em; margin-top: auto; margin-bottom: auto; }
+  .s2 .quote em {
+    font-style: normal; background: var(--violet); color: var(--cream);
+    padding: 0 14px; border-radius: 8px; display: inline-block; transform: rotate(-1deg);
+  }
+  .s2 .number-tag { font-family: 'JetBrains Mono', monospace; font-size: 22px; color: rgba(17,4,34,0.55); letter-spacing: 0.18em; }
+
+  /* SLIDE 3 - LE COÛT */
+  .s3 .canvas { justify-content: space-between; }
+  .s3 .stat-block { margin: auto 0; }
+  .s3 .big-number {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 280px;
+    line-height: 0.85; letter-spacing: -0.05em;
+    background: linear-gradient(180deg, #fff 0%, var(--violet-light) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-left: -8px;
+  }
+  .s3 .stat-caption { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 40px; line-height: 1.15; color: #fff; max-width: 720px; margin-top: 16px; }
+  .s3 .source { font-family: 'Inter', sans-serif; font-size: 22px; color: var(--ink-50); margin-top: 28px; line-height: 1.4; max-width: 720px; }
+  .s3 .orb-1 { width: 500px; height: 500px; background: var(--violet); bottom: -150px; right: -120px; opacity: 0.30; }
+  .s3 .orb-2 { width: 380px; height: 380px; background: var(--violet-light); top: 10%; left: -100px; opacity: 0.25; }
+
+  /* SLIDE 4 - LA SOLUTION */
+  .s4 .canvas { justify-content: space-between; }
+  .s4 .head { margin-top: 0; }
+  .s4 .head .title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 80px; line-height: 1; letter-spacing: -0.02em; margin-top: 16px; }
+  .s4 .list { margin: auto 0; display: flex; flex-direction: column; gap: 24px; width: 100%; }
+  .s4 .row { display: flex; align-items: flex-start; gap: 28px; padding: 28px 0; border-top: 1px solid var(--line); }
+  .s4 .row:last-child { border-bottom: 1px solid var(--line); }
+  .s4 .row .num { font-family: 'JetBrains Mono', monospace; font-size: 24px; color: var(--violet-light); letter-spacing: 0.1em; min-width: 60px; padding-top: 8px; }
+  .s4 .row .text { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 38px; line-height: 1.2; color: #fff; flex: 1; }
+
+  /* SLIDES 5-7 - OFFRES */
+  .offer .canvas { justify-content: space-between; }
+  .offer .price-tag {
+    display: inline-block; padding: 8px 20px; border-radius: 999px;
+    background: rgba(123,47,255,0.2); border: 1px solid var(--violet);
+    font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--violet-light);
+  }
+  .offer .offer-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 88px; line-height: 0.95; letter-spacing: -0.03em; color: #fff; margin-top: 20px; }
+  .offer .offer-price {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 110px; line-height: 1; letter-spacing: -0.04em;
+    background: linear-gradient(180deg, var(--violet-light) 0%, var(--violet) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-top: 32px; margin-bottom: 8px;
+  }
+  .offer .price-period { font-family: 'Inter', sans-serif; font-size: 24px; color: var(--ink-50); font-weight: 400; }
+  .offer .features { display: flex; flex-direction: column; gap: 16px; margin-top: 36px; }
+  .offer .feature { display: flex; align-items: flex-start; gap: 16px; }
+  .offer .feature .check {
+    flex-shrink: 0; width: 32px; height: 32px; border-radius: 8px;
+    background: var(--violet); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px;
+  }
+  .offer .feature .text { font-family: 'Inter', sans-serif; font-size: 24px; line-height: 1.4; color: var(--ink-70); flex: 1; padding-top: 4px; }
+
+  .s5 .orb-1 { width: 450px; height: 450px; background: var(--violet); top: -80px; right: -120px; opacity: 0.30; }
+  .s6 .orb-1 { width: 450px; height: 450px; background: var(--violet-light); bottom: -80px; left: -120px; opacity: 0.30; }
+  .s7 .orb-1 { width: 500px; height: 500px; background: var(--violet-deep); top: 50%; right: -150px; opacity: 0.40; transform: translateY(-50%); }
+
+  /* SLIDE 8 - GARANTIE */
+  .s8 .canvas { justify-content: space-between; }
+  .s8 .tip-box {
+    margin: auto 0; width: 100%;
+    border: 2px solid var(--violet); border-radius: 28px; padding: 56px 48px;
+    background: linear-gradient(160deg, rgba(123,47,255,0.15) 0%, rgba(166,107,255,0.05) 100%);
+    position: relative;
+  }
+  .s8 .tip-badge {
+    position: absolute; top: -22px; left: 32px;
+    background: var(--violet); color: #fff;
+    padding: 10px 18px; border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .s8 .tip-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 60px; line-height: 1.05; letter-spacing: -0.02em; color: #fff; }
+  .s8 .tip-body { font-family: 'Inter', sans-serif; font-size: 28px; line-height: 1.45; color: var(--ink-70); margin-top: 28px; }
+  .s8 .tip-quote { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-style: italic; font-size: 28px; color: var(--violet-light); margin-top: 32px; padding-left: 20px; border-left: 3px solid var(--violet); }
+
+  /* SLIDE 9 - POUR QUI (light) */
+  .s9 { color: var(--ink-on-cream); }
+  .s9 .canvas { justify-content: space-between; }
+  .s9 .recap-head { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 80px; line-height: 1; letter-spacing: -0.025em; margin-top: 8px; }
+  .s9 .recap-list { margin: auto 0; display: flex; flex-direction: column; gap: 22px; width: 100%; }
+  .s9 .recap-item { display: flex; align-items: flex-start; gap: 24px; }
+  .s9 .check {
+    flex-shrink: 0; width: 56px; height: 56px; border-radius: 16px;
+    background: var(--violet); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 30px;
+  }
+  .s9 .recap-text { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 32px; line-height: 1.25; color: var(--ink-on-cream); flex: 1; padding-top: 6px; }
+
+  /* SLIDE 10 - CTA */
+  .s10 .canvas { justify-content: space-between; }
+  .s10 .cta-hook { margin-top: 16px; }
+  .s10 .cta-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 92px; line-height: 0.95; letter-spacing: -0.03em; margin-top: 20px; }
+  .s10 .cta-list { margin: auto 0; display: flex; flex-direction: column; gap: 18px; width: 100%; }
+  .s10 .cta-row {
+    display: flex; align-items: center; gap: 24px;
+    padding: 24px 28px; border-radius: 20px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--line);
+  }
+  .s10 .cta-icon {
+    flex-shrink: 0; width: 64px; height: 64px; border-radius: 16px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 28px;
+    background: var(--violet); color: #fff;
+    box-shadow: 0 0 20px rgba(123,47,255,0.4);
+  }
+
+  .s10 .cta-text { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 30px; line-height: 1.15; color: #fff; flex: 1; }
+  .s10 .cta-sub { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 400; color: var(--ink-50); display: block; margin-top: 4px; letter-spacing: 0; }
+  .s10 .cta-arrow { color: var(--violet-light); font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 500; }
+  .s10 .signoff { text-align: center; width: 100%; margin-top: 24px; }
+  .s10 .signoff .big-pp { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 56px; letter-spacing: -0.03em; line-height: 1; color: #fff; }
+  .s10 .signoff .big-pp .accent { color: var(--violet-light); }
+  .s10 .signoff .handle-big { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--ink-50); margin-top: 8px; letter-spacing: 0.1em; }
+
+  .s10 .orb-1 { width: 600px; height: 600px; background: var(--violet); top: -200px; right: -200px; opacity: 0.30; }
+  .s10 .orb-2 { width: 420px; height: 420px; background: var(--violet-light); bottom: -120px; left: -140px; opacity: 0.30; }
+</style>
+</head>
+<body>
+
+<div class="viewer">
+  <header class="viewer-head">
+    <div>
+      <h1>PP IA Agency — Carrousel Vente</h1>
+      <p>Format Instagram 1080×1350 · 10 slides · Convertir tes prospects en clients</p>
+    </div>
+    <button class="toggle" id="toggleSafe"><span>Afficher safe zones</span></button>
+  </header>
+
+  <!-- SLIDE 1 — HOOK PROVOCATEUR -->
+  <div class="slide-label">Slide 01 — Hook</div>
+  <div class="slide-wrap">
+    <div class="slide s1 slide-dark">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grain"></div>
+      <div class="sticker" style="top: 60px; right: 60px;">RÉEL</div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">01 / 10</span>
+        </div>
+        <div class="hero">
+          <span class="eyebrow">// La vérité</span>
+          <h1 class="title">
+            Ton business<br/>
+            perd des clients<br/>
+            <span class="grad-text">chaque jour</span>.
+          </h1>
+          <p class="subtitle">Et tu ne le vois même pas. Voici pourquoi — et comment l'arrêter.</p>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> Swipe</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — LE MIROIR (light) -->
+  <div class="slide-label">Slide 02 — Le miroir</div>
+  <div class="slide-wrap">
+    <div class="slide s2 light slide-light">
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">02 / 10</span>
+        </div>
+        <div>
+          <span class="number-tag">— TU TE RECONNAIS ?</span>
+          <h2 class="quote" style="margin-top: 40px;">
+            Pas de site.<br/>
+            Pas de réseaux.<br/>
+            Pas de temps.<br/>
+            Et tu te demandes<br/>
+            pourquoi <em>les clients</em><br/>
+            ne viennent pas.
+          </h2>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> Suite</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — LE COÛT -->
+  <div class="slide-label">Slide 03 — Le coût</div>
+  <div class="slide-wrap">
+    <div class="slide s3 slide-dark">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">03 / 10</span>
+        </div>
+        <div class="stat-block">
+          <span class="eyebrow">// Le vrai coût</span>
+          <div class="big-number">76<span style="font-size:0.5em;">%</span></div>
+          <p class="stat-caption">des clients vérifient ta présence en ligne avant d'acheter chez toi.</p>
+          <p class="source">Si tu n'es pas visible sur Internet, ils vont chez ton concurrent. Sans même te connaître.</p>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> La solution</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 — LA SOLUTION -->
+  <div class="slide-label">Slide 04 — La solution</div>
+  <div class="slide-wrap">
+    <div class="slide s4 slide-dark">
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">04 / 10</span>
+        </div>
+        <div class="head">
+          <span class="eyebrow">// La solution</span>
+          <h3 class="title">3 offres.<br/>3 niveaux.<br/>0 prise de tête.</h3>
+        </div>
+        <div class="list">
+          <div class="row">
+            <span class="num">01</span>
+            <span class="text">Pour démarrer, sans te ruiner.</span>
+          </div>
+          <div class="row">
+            <span class="num">02</span>
+            <span class="text">Pour passer un cap sérieusement.</span>
+          </div>
+          <div class="row">
+            <span class="num">03</span>
+            <span class="text">Pour transformer ton business avec l'IA.</span>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> Détails</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 — OFFRE STARTER -->
+  <div class="slide-label">Slide 05 — Pack Starter</div>
+  <div class="slide-wrap">
+    <div class="slide s5 offer slide-dark">
+      <div class="orb orb-1"></div>
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">05 / 10</span>
+        </div>
+        <div>
+          <span class="price-tag">Pack Starter</span>
+          <h3 class="offer-name">Le démarrage<br/>sans risque.</h3>
+          <div class="offer-price">250€<span class="price-period"> / mois</span></div>
+          <div class="features">
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Gestion de tes réseaux sociaux (Instagram, Facebook)</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Création de contenu régulière (posts, stories)</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Community management & réponses aux messages</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Suivi mensuel des résultats</span>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> Pro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — OFFRE PRO -->
+  <div class="slide-label">Slide 06 — Pack Pro</div>
+  <div class="slide-wrap">
+    <div class="slide s6 offer slide-dark">
+      <div class="orb orb-1"></div>
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">06 / 10</span>
+        </div>
+        <div>
+          <span class="price-tag">⚡ Pack Pro · Le + populaire</span>
+          <h3 class="offer-name">Pour passer<br/>un cap.</h3>
+          <div class="offer-price">800€<span class="price-period"> / mois</span></div>
+          <div class="features">
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Tout le Pack Starter inclus</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Stratégie de visibilité avancée</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Gestion complète de ton image en ligne</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Reporting détaillé & optimisations continues</span>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> Premium</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 — OFFRE PREMIUM -->
+  <div class="slide-label">Slide 07 — Pack Premium</div>
+  <div class="slide-wrap">
+    <div class="slide s7 offer slide-dark">
+      <div class="orb orb-1"></div>
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">07 / 10</span>
+        </div>
+        <div>
+          <span class="price-tag">★ Pack Premium · Sur-mesure</span>
+          <h3 class="offer-name">La transformation<br/>complète.</h3>
+          <div class="offer-price">1500€<span class="price-period"> · Paiement unique</span></div>
+          <div class="features">
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Site web professionnel sur-mesure</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Création d'agents IA pour ton business</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Automatisation complète de tes tâches</span>
+            </div>
+            <div class="feature">
+              <span class="check">✓</span>
+              <span class="text">Pack digital complet livré clé en main</span>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> Garantie</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8 — GARANTIE -->
+  <div class="slide-label">Slide 08 — Garantie</div>
+  <div class="slide-wrap">
+    <div class="slide s8 slide-dark">
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">08 / 10</span>
+        </div>
+        <div class="tip-box">
+          <span class="tip-badge">★ Sans risque</span>
+          <h4 class="tip-title">Premier échange offert. Sans engagement.</h4>
+          <p class="tip-body">15 minutes pour comprendre ton business, identifier tes vrais besoins et te dire honnêtement si je peux t'aider. Si on n'est pas faits pour bosser ensemble, je te le dis.</p>
+          <p class="tip-quote">"Ton temps vaut de l'argent. Je ne te ferai pas perdre le mien non plus."</p>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> Pour qui</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9 — POUR QUI (light) -->
+  <div class="slide-label">Slide 09 — Pour qui</div>
+  <div class="slide-wrap">
+    <div class="slide s9 light slide-light">
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">09 / 10</span>
+        </div>
+        <div>
+          <span class="eyebrow">// C'est pour toi si</span>
+          <h3 class="recap-head">Tu te reconnais<br/>dans ça ?</h3>
+        </div>
+        <div class="recap-list">
+          <div class="recap-item">
+            <span class="check">✓</span>
+            <span class="recap-text">Tu es commerçant, artisan ou auto-entrepreneur.</span>
+          </div>
+          <div class="recap-item">
+            <span class="check">✓</span>
+            <span class="recap-text">Tu veux plus de clients sans y passer tes nuits.</span>
+          </div>
+          <div class="recap-item">
+            <span class="check">✓</span>
+            <span class="recap-text">Tu n'as pas le temps (ou l'envie) de gérer tes réseaux.</span>
+          </div>
+          <div class="recap-item">
+            <span class="check">✓</span>
+            <span class="recap-text">Tu veux une image pro qui inspire confiance.</span>
+          </div>
+        </div>
+        <div class="bottom-bar">
+          <span class="handle">@pacome.po</span>
+          <span class="swipe"><span class="arrow">→</span> Action</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10 — CTA -->
+  <div class="slide-label">Slide 10 — Call to action</div>
+  <div class="slide-wrap">
+    <div class="slide s10 slide-dark">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="grain"></div>
+      <div class="canvas">
+        <div class="top-bar">
+          <span class="logo"><span class="symbol">P²</span>PP IA Agency</span>
+          <span class="pagenb">10 / 10</span>
+        </div>
+        <div class="cta-hook">
+          <span class="eyebrow">// Maintenant</span>
+          <h2 class="cta-title">3 façons<br/>de <span class="grad-text">commencer</span>.</h2>
+        </div>
+        <div class="cta-list">
+          <div class="cta-row">
+            <span class="cta-icon">✦</span>
+            <span class="cta-text">WhatsApp moi maintenant<span class="cta-sub">Premier échange offert · 15 min</span></span>
+            <span class="cta-arrow">→</span>
+          </div>
+          <div class="cta-row">
+            <span class="cta-icon">⌘</span>
+            <span class="cta-text">Sauvegarde ce post<span class="cta-sub">Pour le ressortir quand tu seras prêt</span></span>
+            <span class="cta-arrow">→</span>
+          </div>
+          <div class="cta-row">
+            <span class="cta-icon">+</span>
+            <span class="cta-text">Suis @pacome.po<span class="cta-sub">Conseils digitaux gratuits chaque semaine</span></span>
+            <span class="cta-arrow">→</span>
+          </div>
+        </div>
+        <div class="signoff">
+          <div class="big-pp">PP IA <span class="accent">Agency</span></div>
+          <div class="handle-big">wa.me/33768070623</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const btn = document.getElementById('toggleSafe');
+  btn.addEventListener('click', () => {
+    document.body.classList.toggle('show-safe');
+    btn.classList.toggle('active');
+    btn.querySelector('span').textContent =
+      document.body.classList.contains('show-safe')
+        ? 'Masquer safe zones'
+        : 'Afficher safe zones';
+  });
+</script>
+
+</body>
+</html>
