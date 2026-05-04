@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>PP IA Agency — Capture Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --violet: #7B2FFF;
+    --violet-light: #A66BFF;
+    --violet-glow: #B8A1FF;
+    --bg-0: #07020F;
+    --bg-1: #14072B;
+    --bg-2: #2A0F5E;
+    --cream: #F5F1E8;
+    --ink-on-cream: #110422;
+    --ink-70: rgba(255,255,255,0.72);
+    --ink-50: rgba(255,255,255,0.50);
+    --line: rgba(255,255,255,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: #111;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Navigation */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 20px; width: 100%;
+    max-width: calc((100vh - 80px) * 4 / 5);
+  }
+  .nav button {
+    padding: 10px 24px; border-radius: 999px;
+    border: none; cursor: pointer;
+    font-family: 'Inter', sans-serif; font-weight: 600; font-size: 15px;
+  }
+  .btn-prev { background: rgba(255,255,255,0.1); color: #fff; }
+  .btn-next { background: var(--violet); color: #fff; box-shadow: 0 0 16px rgba(123,47,255,0.5); }
+  .btn-prev:disabled { opacity: 0.3; }
+  .counter {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    color: rgba(255,255,255,0.5); letter-spacing: 0.1em;
+  }
+
+  /* Hint */
+  .hint {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: rgba(255,255,255,0.4); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 8px;
+    text-align: center;
+  }
+
+  /* Slides container — FORMAT 4:5 INSTAGRAM */
+  .slides {
+    width: 100vw;
+    height: calc(100vw * 5 / 4);
+    max-height: calc(100vh - 80px);
+    max-width: calc((100vh - 80px) * 4 / 5);
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: none; flex-direction: column;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+
+  /* DARK SLIDE BASE */
+  .dark {
+    background:
+      radial-gradient(60% 50% at 80% 0%, rgba(123,47,255,0.55) 0%, transparent 60%),
+      radial-gradient(50% 40% at 0% 100%, rgba(166,107,255,0.35) 0%, transparent 60%),
+      linear-gradient(160deg, var(--bg-0) 0%, var(--bg-1) 55%, var(--bg-2) 100%);
+    color: #fff;
+  }
+
+  /* LIGHT SLIDE BASE */
+  .light {
+    background:
+      radial-gradient(50% 40% at 100% 0%, rgba(123,47,255,0.20) 0%, transparent 60%),
+      radial-gradient(60% 40% at 0% 100%, rgba(166,107,255,0.25) 0%, transparent 60%),
+      var(--cream);
+    color: var(--ink-on-cream);
+  }
+
+  .grain {
+    position: absolute; inset: 0; pointer-events: none;
+    opacity: 0.06; mix-blend-mode: overlay;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px),
+      radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px);
+    background-size: 3px 3px, 5px 5px;
+  }
+
+  .orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(60px); pointer-events: none;
+  }
+
+  /* CANVAS */
+  .canvas {
+    position: relative; z-index: 2;
+    flex: 1; display: flex; flex-direction: column;
+    padding: 48px 28px 80px;
+  }
+
+  /* LOGO */
+  .logo {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px;
+  }
+  .logo .sym {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--violet); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    box-shadow: 0 0 16px rgba(123,47,255,0.5);
+  }
+  .light .logo { color: var(--ink-on-cream); }
+
+  .top-bar { display: flex; align-items: center; justify-content: space-between; }
+  .pagenb {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    letter-spacing: 0.18em; color: var(--ink-50);
+  }
+  .light .pagenb { color: rgba(17,4,34,0.5); }
+
+  .bottom-bar {
+    margin-top: auto;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .handle {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--ink-50); letter-spacing: 0.06em;
+  }
+  .light .handle { color: rgba(17,4,34,0.55); }
+
+  .swipe {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 500; color: var(--ink-70);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .swipe .arrow {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--violet); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .light .swipe { color: rgba(17,4,34,0.7); }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--violet-light); margin-bottom: 12px;
+  }
+  .light .eyebrow { color: var(--violet); }
+
+  .grad-text {
+    background: linear-gradient(110deg, var(--violet-light) 0%, var(--violet-glow) 50%, #fff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* SLIDE 1 */
+  .s1 .hero { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+  .s1 .title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 52px; line-height: 0.95; letter-spacing: -0.02em; }
+  .s1 .subtitle { font-size: 16px; color: var(--ink-70); line-height: 1.4; }
+  .s1 .orb1 { width: 300px; height: 300px; background: var(--violet); top: -80px; right: -80px; opacity: 0.5; }
+  .s1 .orb2 { width: 250px; height: 250px; background: var(--violet-light); bottom: -60px; left: -80px; opacity: 0.3; }
+  .sticker {
+    position: absolute; top: 40px; right: 28px; z-index: 3;
+    background: var(--violet); color: #fff;
+    padding: 8px 14px; border-radius: 10px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px;
+    transform: rotate(-6deg); box-shadow: 0 8px 20px rgba(123,47,255,0.5);
+  }
+
+  /* SLIDE 2 */
+  .s2 .quote { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .s2 .number-tag { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(17,4,34,0.55); letter-spacing: 0.15em; margin-bottom: 20px; }
+  .s2 .quote-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 38px; line-height: 1.1; letter-spacing: -0.02em; }
+  .s2 .quote-text em {
+    font-style: normal; background: var(--violet); color: var(--cream);
+    padding: 0 10px; border-radius: 6px; display: inline-block; transform: rotate(-1deg);
+  }
+
+  /* SLIDE 3 */
+  .s3 .orb1 { width: 300px; height: 300px; background: var(--violet); bottom: -80px; right: -60px; opacity: 0.35; }
+  .s3 .content { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+  .s3 .big-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 52px; line-height: 0.9; letter-spacing: -0.03em; background: linear-gradient(180deg, #fff 0%, var(--violet-light) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .s3 .caption { font-size: 16px; color: var(--ink-70); line-height: 1.4; max-width: 280px; }
+
+  /* SLIDE 4 */
+  .s4 .content { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+  .s4 .title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 36px; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .s4 .row { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .s4 .row:last-child { border-bottom: 1px solid var(--line); }
+  .s4 .num { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--violet-light); min-width: 36px; padding-top: 2px; }
+  .s4 .text { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 20px; line-height: 1.25; color: #fff; }
+
+  /* SLIDES 5-7 */
+  .point .orb1 { width: 280px; height: 280px; background: var(--violet); top: -60px; right: -60px; opacity: 0.35; }
+  .point .content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .point .point-num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 120px; line-height: 0.85; letter-spacing: -0.05em; color: var(--violet-light); margin-bottom: 8px; }
+  .point .point-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 30px; line-height: 1.1; letter-spacing: -0.02em; color: #fff; margin-bottom: 16px; }
+  .point .point-desc { font-size: 15px; line-height: 1.45; color: var(--ink-70); margin-bottom: 20px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 14px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-70);
+    margin-right: 8px;
+  }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); box-shadow: 0 0 8px var(--violet); }
+
+  /* SLIDE 8 */
+  .s8 .content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .s8 .tip-box {
+    border: 2px solid var(--violet); border-radius: 20px; padding: 36px 24px;
+    background: linear-gradient(160deg, rgba(123,47,255,0.15) 0%, rgba(166,107,255,0.05) 100%);
+    position: relative; margin-top: 16px;
+  }
+  .s8 .tip-badge {
+    position: absolute; top: -16px; left: 20px;
+    background: var(--violet); color: #fff;
+    padding: 6px 14px; border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+  }
+  .s8 .tip-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.1; color: #fff; margin-bottom: 16px; }
+  .s8 .tip-body { font-size: 15px; line-height: 1.45; color: var(--ink-70); margin-bottom: 20px; }
+  .s8 .tip-quote { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-style: italic; color: var(--violet-light); padding-left: 14px; border-left: 2px solid var(--violet); }
+
+  /* SLIDE 9 */
+  .s9 .recap-head { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 40px; line-height: 1; letter-spacing: -0.02em; margin: 12px 0 16px; }
+  .s9 .recap-list { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+  .s9 .item { display: flex; align-items: flex-start; gap: 14px; }
+  .s9 .check {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px;
+    background: var(--violet); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px;
+  }
+  .s9 .item-text { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 18px; line-height: 1.3; color: var(--ink-on-cream); padding-top: 8px; }
+
+  /* SLIDE 10 */
+  .s10 .orb1 { width: 350px; height: 350px; background: var(--violet); top: -120px; right: -100px; opacity: 0.3; }
+  .s10 .orb2 { width: 250px; height: 250px; background: var(--violet-light); bottom: -80px; left: -80px; opacity: 0.3; }
+  .s10 .cta-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 44px; line-height: 0.95; letter-spacing: -0.02em; margin: 12px 0 20px; }
+  .s10 .cta-list { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+  .s10 .cta-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 18px; border-radius: 14px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--line);
+  }
+  .s10 .cta-icon {
+    flex-shrink: 0; width: 48px; height: 48px; border-radius: 12px;
+    background: var(--violet); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: 0 0 16px rgba(123,47,255,0.4);
+  }
+  .s10 .cta-text { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; line-height: 1.2; color: #fff; flex: 1; }
+  .s10 .cta-sub { font-size: 12px; font-weight: 400; color: var(--ink-50); display: block; margin-top: 2px; }
+  .s10 .signoff { text-align: center; margin-top: 16px; }
+  .s10 .signoff .big { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 32px; letter-spacing: -0.02em; }
+  .s10 .signoff .big .accent { color: var(--violet-light); }
+  .s10 .signoff .sub { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-50); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="hint">📸 Capture → slide suivante</div>
+
+<!-- SLIDE 1 -->
+<div class="slide s1 dark active">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="grain"></div>
+  <div class="sticker">NEW · 2026</div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">01 / 10</span>
+    </div>
+    <div class="hero">
+      <div class="eyebrow">// Nouvelle étape</div>
+      <h1 class="title">Je lance<br/><span class="grad-text">PP IA Agency</span>.</h1>
+      <p class="subtitle">L'agence qui aide les commerçants et entrepreneurs à développer leur business grâce à l'IA et au digital.</p>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> Swipe</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide s2 light">
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">02 / 10</span>
+    </div>
+    <div class="quote">
+      <div class="number-tag">— QUI JE SUIS</div>
+      <div class="quote-text">Je suis<br/><em>Pacôme</em>.<br/>Et je vais<br/>t'aider à<br/>scaler.</div>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> Suite</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide s3 dark">
+  <div class="orb orb1"></div>
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">03 / 10</span>
+    </div>
+    <div class="content">
+      <div class="eyebrow">// Le vrai problème</div>
+      <div class="big-text">Trop<br/>de tâches.<br/>Pas assez<br/>de temps.</div>
+      <p class="caption">Tu gères ta boîte, ta compta, tes réseaux, tes clients... et tu n'as plus le temps de faire ce que tu sais faire de mieux : ton métier.</p>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> La suite</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide s4 dark">
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">04 / 10</span>
+    </div>
+    <div class="content">
+      <div class="eyebrow">// Ma mission</div>
+      <div class="title">Te faire gagner<br/>du temps,<br/>des clients,<br/>de l'argent.</div>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> Mes services</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide s5 point dark">
+  <div class="orb orb1"></div>
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">05 / 10</span>
+    </div>
+    <div class="content">
+      <div class="point-num">01</div>
+      <div class="point-title">Je gère tes réseaux sociaux.</div>
+      <p class="point-desc">Création de contenu, publications régulières, interaction avec ta communauté. Tu te concentres sur ton métier — moi je m'occupe de ta visibilité.</p>
+      <div><span class="pill"><span class="dot"></span>Instagram</span><span class="pill"><span class="dot"></span>Facebook</span></div>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> 02</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide s6 point dark">
+  <div class="orb orb1"></div>
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">06 / 10</span>
+    </div>
+    <div class="content">
+      <div class="point-num">02</div>
+      <div class="point-title">Je crée ton site web.</div>
+      <p class="point-desc">Un site professionnel qui inspire confiance, attire des clients et te démarque de la concurrence. Livré en 24h grâce à mon équipe d'experts.</p>
+      <div><span class="pill"><span class="dot"></span>Site web</span><span class="pill"><span class="dot"></span>24h</span></div>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> 03</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide s7 point dark">
+  <div class="orb orb1"></div>
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">07 / 10</span>
+    </div>
+    <div class="content">
+      <div class="point-num">03</div>
+      <div class="point-title">J'automatise ton business.</div>
+      <p class="point-desc">Agents IA, automatisations sur-mesure, gestion administrative. Je transforme tes tâches répétitives en processus automatiques.</p>
+      <div><span class="pill"><span class="dot"></span>Agents IA</span><span class="pill"><span class="dot"></span>Automation</span></div>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> Pourquoi moi</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide s8 dark">
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">08 / 10</span>
+    </div>
+    <div class="content">
+      <div class="eyebrow">// Ce qui me différencie</div>
+      <div class="tip-box">
+        <span class="tip-badge">★ Différenciation</span>
+        <div class="tip-title">Une agence à taille humaine. Une équipe d'experts derrière.</div>
+        <p class="tip-body">Tu as un seul interlocuteur — moi. Mais derrière, c'est toute une équipe technique avec 5+ ans d'expérience qui travaille pour ton business.</p>
+        <p class="tip-quote">"Le contact humain d'un freelance. La puissance d'une agence."</p>
+      </div>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> Promesse</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide s9 light">
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">09 / 10</span>
+    </div>
+    <div class="eyebrow">// Ma promesse</div>
+    <div class="recap-head">Ce que tu obtiens.</div>
+    <div class="recap-list">
+      <div class="item"><span class="check">✓</span><span class="item-text">Plus de visibilité en ligne, plus de clients.</span></div>
+      <div class="item"><span class="check">✓</span><span class="item-text">Du temps libre pour ton cœur de métier.</span></div>
+      <div class="item"><span class="check">✓</span><span class="item-text">Une présence digitale pro qui inspire confiance.</span></div>
+      <div class="item"><span class="check">✓</span><span class="item-text">Un partenaire de confiance, pas juste un prestataire.</span></div>
+    </div>
+    <div class="bottom-bar">
+      <span class="handle">@pacome.po</span>
+      <span class="swipe"><span class="arrow">→</span> Action</span>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide s10 dark">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="grain"></div>
+  <div class="canvas">
+    <div class="top-bar">
+      <span class="logo"><span class="sym">P²</span>PP IA Agency</span>
+      <span class="pagenb">10 / 10</span>
+    </div>
+    <div class="eyebrow">// À toi de jouer</div>
+    <div class="cta-title">Prêt à passer au <span class="grad-text">niveau supérieur</span>&nbsp;?</div>
+    <div class="cta-list">
+      <div class="cta-row">
+        <span class="cta-icon">✦</span>
+        <span class="cta-text">Premier échange offert<span class="cta-sub">15 min pour comprendre tes besoins</span></span>
+      </div>
+      <div class="cta-row">
+        <span class="cta-icon">✉</span>
+        <span class="cta-text">WhatsApp direct<span class="cta-sub">Réponse rapide, sans engagement</span></span>
+      </div>
+      <div class="cta-row">
+        <span class="cta-icon">+</span>
+        <span class="cta-text">Suis @pacome.po<span class="cta-sub">Conseils digitaux chaque semaine</span></span>
+      </div>
+    </div>
+    <div class="signoff">
+      <div class="big">PP IA <span class="accent">Agency</span></div>
+      <div class="sub">wa.me/33768070623</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<div class="nav">
+  <button class="btn-prev" id="prev" disabled>← Préc.</button>
+  <span class="counter" id="counter">1 / 10</span>
+  <button class="btn-next" id="next">Suiv. →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+
+  function show(n) {
+    slides[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+    document.getElementById('prev').disabled = current === 0;
+    document.getElementById('next').disabled = current === slides.length - 1;
+  }
+
+  document.getElementById('prev').addEventListener('click', () => { if (current > 0) show(current - 1); });
+  document.getElementById('next').addEventListener('click', () => { if (current < slides.length - 1) show(current + 1); });
+
+  // Swipe support
+  let startX = 0;
+  document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && current < slides.length - 1) show(current + 1);
+      else if (diff < 0 && current > 0) show(current - 1);
+    }
+  });
+</script>
+</body>
+</html>
