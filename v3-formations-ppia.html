@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formations IA — PP IA Agency</title>
+<meta name="description" content="Apprends à utiliser l'IA dans ta vraie vie. Formations en groupe ou 1-to-1 avec Pacôme — PP IA Agency.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --noir: #000000;
+  --violet: #7B2FFF;
+  --violet-soft: #9B5BFF;
+  --blanc: #FFFFFF;
+  --gris: #B5B5B5;
+  --gris-card: #0F0F12;
+  --gris-border: #1F1F25;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--noir);
+  color: var(--blanc);
+  font-family: 'Manrope', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Texture grain */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* HEADER */
+header {
+  padding: 32px 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--gris-border);
+}
+
+.logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--violet);
+  border-radius: 8px;
+  color: var(--blanc);
+  font-weight: 800;
+}
+
+.logo-mark sup {
+  font-size: 0.7em;
+  margin-left: 1px;
+}
+
+.tag-header {
+  font-size: 12px;
+  color: var(--gris);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* HERO */
+.hero {
+  padding: 80px 0 64px;
+  position: relative;
+}
+
+.hero-eyebrow {
+  display: inline-block;
+  padding: 6px 14px;
+  background: rgba(123, 47, 255, 0.15);
+  border: 1px solid var(--violet);
+  border-radius: 999px;
+  color: var(--violet-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: clamp(44px, 9vw, 80px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+}
+
+.hero h1 .accent {
+  color: var(--violet);
+  font-style: italic;
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--gris);
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+.hero-by {
+  margin-top: 32px;
+  font-size: 14px;
+  color: var(--gris);
+}
+
+.hero-by strong { color: var(--blanc); font-weight: 600; }
+
+/* SECTION */
+.section {
+  padding: 64px 0;
+}
+
+.section-label {
+  font-size: 12px;
+  color: var(--violet-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+}
+
+.section-desc {
+  color: var(--gris);
+  font-size: 16px;
+  margin-bottom: 40px;
+  max-width: 520px;
+}
+
+/* OFFRE CARD */
+.offre {
+  background: var(--gris-card);
+  border: 1px solid var(--gris-border);
+  border-radius: 20px;
+  padding: 40px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.offre:hover {
+  border-color: var(--violet);
+}
+
+.offre.featured {
+  border-color: var(--violet);
+  background: linear-gradient(180deg, rgba(123, 47, 255, 0.08) 0%, var(--gris-card) 100%);
+}
+
+.offre-badge {
+  display: inline-block;
+  background: var(--violet);
+  color: var(--blanc);
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.offre-titre {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+  line-height: 1.1;
+}
+
+.offre-format {
+  color: var(--gris);
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.prix-block {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.prix {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 56px;
+  color: var(--violet);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.prix-old {
+  font-size: 20px;
+  color: var(--gris);
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.prix-info {
+  font-size: 13px;
+  color: var(--gris);
+  margin-bottom: 28px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--gris-border);
+  margin: 28px 0;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gris-border);
+  font-size: 15px;
+}
+
+.detail-row:last-child { border-bottom: none; }
+
+.detail-label { color: var(--gris); }
+.detail-value { color: var(--blanc); font-weight: 600; }
+.detail-value.violet { color: var(--violet-soft); }
+
+.includes {
+  margin-top: 28px;
+}
+
+.includes-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--violet-soft);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.includes ul {
+  list-style: none;
+}
+
+.includes li {
+  padding: 8px 0 8px 28px;
+  position: relative;
+  font-size: 15px;
+  color: var(--blanc);
+}
+
+.includes li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--violet);
+  font-weight: 700;
+}
+
+/* PACKS 1-TO-1 */
+.packs-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.pack-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: rgba(123, 47, 255, 0.06);
+  border: 1px solid var(--gris-border);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.pack-row:hover {
+  border-color: var(--violet);
+  transform: translateX(4px);
+}
+
+.pack-info { display: flex; flex-direction: column; }
+.pack-nom {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+.pack-duree {
+  font-size: 13px;
+  color: var(--gris);
+}
+
+.pack-prix {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--violet);
+}
+
+/* PAIEMENT */
+.paiement {
+  background: rgba(123, 47, 255, 0.08);
+  border: 1px solid rgba(123, 47, 255, 0.3);
+  border-radius: 16px;
+  padding: 28px;
+  margin: 40px 0;
+  text-align: center;
+}
+
+.paiement-titre {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.paiement-desc {
+  color: var(--gris);
+  font-size: 15px;
+}
+
+.paiement-desc strong {
+  color: var(--blanc);
+}
+
+/* CTA */
+.cta-section {
+  text-align: center;
+  padding: 80px 0 40px;
+}
+
+.cta-section h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: clamp(36px, 6vw, 56px);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.cta-section p {
+  color: var(--gris);
+  font-size: 17px;
+  margin-bottom: 32px;
+}
+
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-family: 'Manrope', sans-serif;
+  min-width: 280px;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: var(--violet);
+  color: var(--blanc);
+}
+
+.btn-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.btn-primary:hover {
+  background: var(--violet-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(123, 47, 255, 0.3);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--blanc);
+  border: 1px solid var(--gris-border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--violet);
+}
+
+/* FOOTER */
+footer {
+  padding: 40px 0;
+  text-align: center;
+  border-top: 1px solid var(--gris-border);
+  color: var(--gris);
+  font-size: 13px;
+}
+
+footer .slogan {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--blanc);
+  margin-bottom: 12px;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero, .offre, .paiement, .cta-section {
+  animation: fadeUp 0.8s ease forwards;
+}
+
+.offre:nth-child(2) { animation-delay: 0.1s; }
+.offre:nth-child(3) { animation-delay: 0.2s; }
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .hero { padding: 60px 0 40px; }
+  .section { padding: 48px 0; }
+  .offre { padding: 32px 24px; }
+  .prix { font-size: 48px; }
+  .pack-row { padding: 14px 16px; }
+  .pack-prix { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+  <div class="logo">
+    <span class="logo-mark">P<sup>2</sup></span>
+    <span>PP IA</span>
+  </div>
+  <span class="tag-header">Formations</span>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">Nouveau · Lancement 2026</div>
+  <h1>L'IA. <br><span class="accent">Pour de vrai.</span></h1>
+  <p class="hero-sub">Apprends à utiliser l'IA dans ta vie perso et pro. Sans jargon. Sans bullshit. Avec quelqu'un qui partait de zéro y'a pas si longtemps.</p>
+  <div class="hero-by">Par <strong>Pacôme</strong> — PP IA Agency</div>
+</section>
+
+<section class="section">
+  <div class="section-label">— Offre 01</div>
+  <h2 class="section-title">Formation Groupe<br>Débutants</h2>
+  <p class="section-desc">Tu pars de zéro ? On démarre ensemble. 4 sessions étalées pour bien intégrer, en visio ou présentiel.</p>
+
+  <div class="offre featured">
+    <div class="offre-badge">Early Bird</div>
+    <h3 class="offre-titre">L'IA pour les débutants</h3>
+    <p class="offre-format">4 sessions de 2h · 1 par semaine · Groupe de 5 max</p>
+
+    <div class="prix-block">
+      <span class="prix">197€</span>
+      <span class="prix-old">297€</span>
+    </div>
+    <div class="prix-info">→ Tarif lancement pour les 5 premières inscriptions</div>
+
+    <div class="divider"></div>
+
+    <div class="detail-row">
+      <span class="detail-label">Durée totale</span>
+      <span class="detail-value">8 heures</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Prix par session</span>
+      <span class="detail-value">49€ les 2h</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Prix par heure</span>
+      <span class="detail-value">25€ / heure</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Paiement en 3x</span>
+      <span class="detail-value violet">3 × 66€</span>
+    </div>
+
+    <div class="includes">
+      <div class="includes-title">Ce qui est inclus</div>
+      <ul>
+        <li>4 sessions live de 2h avec moi</li>
+        <li>Tous les supports PDF à garder</li>
+        <li>Exercices pratiques sur tes vrais besoins</li>
+        <li>Mon WhatsApp ouvert pendant 1 mois après</li>
+        <li>Accès au groupe privé des élèves</li>
+      </ul>
+    </div>
+
+    <div class="includes" style="margin-top: 32px;">
+      <div class="includes-title">Programme</div>
+      <ul>
+        <li>S1 — C'est quoi l'IA en vrai (+ création de compte)</li>
+        <li>S2 — Bien parler à l'IA (le prompting)</li>
+        <li>S3 — L'IA dans ta vie perso et pro</li>
+        <li>S4 — Autonomie & aller plus loin</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">— Offre 02</div>
+  <h2 class="section-title">1-to-1<br>Sur Mesure</h2>
+  <p class="section-desc">Tu as déjà des bases ? On bosse sur tes vrais objectifs. Programme 100% adapté à toi.</p>
+
+  <div class="offre">
+    <h3 class="offre-titre">Formation personnalisée</h3>
+    <p class="offre-format">Sessions de 1h ou 2h · En visio ou présentiel</p>
+
+    <div class="packs-grid">
+      <div class="pack-row">
+        <div class="pack-info">
+          <div class="pack-nom">Pack Découverte</div>
+          <div class="pack-duree">3 heures · idéal pour démarrer</div>
+        </div>
+        <div class="pack-prix">200€</div>
+      </div>
+
+      <div class="pack-row">
+        <div class="pack-info">
+          <div class="pack-nom">Pack Avancé</div>
+          <div class="pack-duree">5 heures · au lieu de 450€</div>
+        </div>
+        <div class="pack-prix">400€</div>
+      </div>
+
+      <div class="pack-row">
+        <div class="pack-info">
+          <div class="pack-nom">Pack Maîtrise</div>
+          <div class="pack-duree">10 heures · au lieu de 900€</div>
+        </div>
+        <div class="pack-prix">750€</div>
+      </div>
+    </div>
+
+    <div class="includes" style="margin-top: 32px;">
+      <div class="includes-title">Ce qui est inclus</div>
+      <ul>
+        <li>Programme 100% adapté à tes objectifs</li>
+        <li>Sessions filmées si tu veux (pour réviser)</li>
+        <li>Mon WhatsApp ouvert pendant la formation</li>
+        <li>Bilan personnalisé en fin de parcours</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="paiement">
+  <div class="paiement-titre">💳 Paiement souple</div>
+  <p class="paiement-desc">Toutes les formations sont payables en <strong>1, 2 ou 3 fois sans frais</strong>. On s'arrange.</p>
+</div>
+
+<section class="cta-section">
+  <h2>On démarre ?</h2>
+  <p>Réserve ta place ou pose-moi tes questions.<br>Je réponds dans la journée.</p>
+
+  <div class="cta-buttons">
+    <a href="https://wa.me/33768070623" class="btn btn-primary">
+      <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+      Écris-moi sur WhatsApp
+    </a>
+    <a href="https://instagram.com/pacome.po" class="btn btn-secondary">
+      <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+        <defs>
+          <radialGradient id="ig-grad" cx="30%" cy="107%" r="150%">
+            <stop offset="0" stop-color="#FED576"/>
+            <stop offset="0.26" stop-color="#F47133"/>
+            <stop offset="0.61" stop-color="#BC3081"/>
+            <stop offset="1" stop-color="#4C63D2"/>
+          </radialGradient>
+        </defs>
+        <path fill="url(#ig-grad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+      </svg>
+      Suis-moi sur Instagram
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="slogan">"On s'occupe de tout."</div>
+  <div>PP IA Agency · Le Cannet, Côte d'Azur · 2026</div>
+</footer>
+
+</div>
+
+</body>
+</html>
